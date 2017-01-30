@@ -130,7 +130,6 @@ def breadthFirstSearch(problem):
             return solution(tempNode)
 
         if tempNode[0] not in exploredSet:
-            print "tempNode[0" , tempNode[0]
             exploredSet.add(tempNode[0])
             for successor in problem.getSuccessors(tempNode[0]):
                 child = [successor[0], " ".join((tempNode[1], successor[1])), 1]

@@ -289,6 +289,7 @@ class CornersProblem(search.SearchProblem):
         # Please add any code here which you would like to use
         # in initializing the problem
         self.startState = (startingGameState.getPacmanPosition(), self.corners)
+        self.cornerGameState = startingGameState
         #print "cornerType" , type
         "*** YOUR CODE HERE ***"
 
@@ -370,12 +371,26 @@ def cornersHeuristic(state, problem):
     """
     corners = problem.corners # These are the corner coordinates
     walls = problem.walls # These are the walls of the maze, as a Grid (game.py)
+    gameSt = problem.cornerGameState
+    cornersRemaining = state[1]
+    nearestCornerDistace =0
+    sumoftotal = 0
+    if len(cornersRemaining) != 0:
+        nearestCorner = cornersRemaining[0]
+        nearestCornerDistace = mazeDistance(state[0],cornersRemaining[0],gameSt)
+        for cornerRem in cornersRemaining:
+            tempDistance = mazeDistance(state[0],cornerRem,gameSt)
+            if nearestCornerDistace > tempDistance:
+                nearestCornerDistace = tempDistance
+
+        #sumoftotal = sumoftotal + nearestCornerDistace
     #print "corners" , corners[0]
-    all_min_list=[manhattanDistance(state[0],corners[0]),manhattanDistance(state[0],corners[1]),manhattanDistance(state[0],corners[2]),manhattanDistance(state[0],corners[3])]
+   # all_min_list=[manhattanDistance(state[0],corners[0]),manhattanDistance(state[0],corners[1]),manhattanDistance(state[0],corners[2]),manhattanDistance(state[0],corners[3])]
     #index_min = min(xrange(len(all_min_list)), key=all_min_list.__getitem__)
     "*** YOUR CODE HERE ***"
-    return min(all_min_list)
-    return 0 # Default to trivial solution
+   # all_min_list2 = [mazeDistance(state[0],corners[0],gameState),mazeDistance(state[0],corners[1],gameState),mazeDistance(state[0],corners[2],gameState),mazeDistance(state[0],corners[3],gameState)]
+    #a  = min(all_min_list2) return a
+    return nearestCornerDistace # Default to trivial solution
 
 class AStarCornersAgent(SearchAgent):
     "A SearchAgent for FoodSearchProblem using A* and your foodHeuristic"
