@@ -518,7 +518,7 @@ def foodHeuristic(state, problem):
 
        # print "foodRemainingLength", len(foodRemaining)
 
-        tempdisbetweenfoods = manhattanDistance(state[0],foodrem) + costFromOneState(foodrem,foodRemaining2,gameState)
+        tempdisbetweenfoods = mazeDistance(state[0],foodrem,gameState) + costFromOneState(foodrem,foodRemaining2,gameState)
        # print "foodRemainingLengthAfter", len(foodRemaining)
        # print 'inside for foodlist',foodList
         foodList.append(tempdisbetweenfoods)
@@ -665,10 +665,10 @@ def costFromOneState(state,foodRemain,gameStat):
     while len(foodRemain)!=0:
         #print "lenfth" , len(cornersRemaining)
         nearestCorner = foodRemain[0]
-        nearestCornerDistace = manhattanDistance(currentState,foodRemain[0])
+        nearestCornerDistace = mazeDistance(currentState,foodRemain[0],gameStat)
         for cornerRem in foodRemain:
 
-                tempDistance = manhattanDistance(currentState, cornerRem)
+                tempDistance = mazeDistance(currentState, cornerRem,gameStat)
                 if nearestCornerDistace> tempDistance:
                     nearestCornerDistace = tempDistance
                     nearestCorner = cornerRem

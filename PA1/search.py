@@ -89,22 +89,31 @@ def depthFirstSearch(problem):
     """
     "*** YOUR CODE HERE ***"
 
+    # defining start state of the problem
     startState = [problem.getStartState(), 'Stop', 0]
-   # print startState
+
+   # Checking for goal state
     if problem.isGoalState(startState[0]):
         return startState[1]
 
+    # using stack data structure for storing fringe
     nodeStack = util.Stack();
     nodeStack.push(startState)
+    # Keeping all the visited in a set
     exploredSet = set()
     while not nodeStack.isEmpty():
+        # popping the deepest node
         tempNode = nodeStack.pop()
+        # checking goal state only after popping the node
         if problem.isGoalState(tempNode[0]):
             return solution(tempNode)
 
+        # Checking current state or node is in explored set or not
         if tempNode[0] not in exploredSet:
+            # adding node to explored set
             exploredSet.add(tempNode[0])
             for successor in problem.getSuccessors(tempNode[0]):
+                # defiing child node such that it stores information to reconstruct the path and cost of the plan
                 child = [successor[0], " ".join((tempNode[1], successor[1])), 1]
                 nodeStack.push(child)
 
@@ -116,23 +125,41 @@ def depthFirstSearch(problem):
 def breadthFirstSearch(problem):
     """Search the shallowest nodes in the search tree first."""
     "*** YOUR CODE HERE ***"
+    # defining start state of the problem
     startState = [problem.getStartState(), 'Stop', 0]
-   # print startState
+
+    # Checking for goal state
     if problem.isGoalState(startState[0]):
         return startState[1]
 
+    # using queue data structure for storing fringe
     nodeQueue = util.Queue();
+
+    # pushing start state to the fringe
     nodeQueue.push(startState)
+
+    # Keeping all the visited nodes in a set
     exploredSet = set()
+
     while not nodeQueue.isEmpty():
+        # popping the shallowest node
         tempNode = nodeQueue.pop()
+
+        # checking goal state only after popping the node
         if problem.isGoalState(tempNode[0]):
             return solution(tempNode)
 
+        # Checking current state or node is in explored set or not
         if tempNode[0] not in exploredSet:
+
+            # adding node to explored set
             exploredSet.add(tempNode[0])
             for successor in problem.getSuccessors(tempNode[0]):
+
+                # defining child node such that it stores information to reconstruct the path and cost of the plan
                 child = [successor[0], " ".join((tempNode[1], successor[1])), 1]
+
+                # pushing child to frontier
                 nodeQueue.push(child)
 
     else:
@@ -142,27 +169,48 @@ def breadthFirstSearch(problem):
 
 def uniformCostSearch(problem):
     """Search the node of least total cost first."""
+
+    # defining start state of the problem
     startState = [problem.getStartState(), 'Stop', 0]
-    #print startState
+
+    # Checking for goal state
     if problem.isGoalState(startState[0]):
         return startState[1]
 
+    # using priority queue data structure for storing fringe
     nodePriorityQueue = util.PriorityQueue();
+
+    # pushing start state to fringe
     nodePriorityQueue.push(startState,0)
+
+    # Keeping all the visited nodes in a set
     exploredSet = set()
+
     while not nodePriorityQueue.isEmpty():
+
+        # popping the node with least cumulative cost for next action
         tempNode = nodePriorityQueue.pop()
+
+        # checking goal state only after popping the node
         if problem.isGoalState(tempNode[0]):
             return solution(tempNode)
 
+        # Checking current state or node is in explored set or not
         if tempNode[0] not in exploredSet:
+
+            # adding node to explored set
             exploredSet.add(tempNode[0])
+
             for successor in problem.getSuccessors(tempNode[0]):
+
+                # defining child node such that it stores information to reconstruct the path
                 child = [successor[0], " ".join((tempNode[1], successor[1])), 1]
+
                 tempList = child[1].split()
-                #print "tempList",tempList
+
                 tempCost = problem.getCostOfActions(tempList[1:])
-                #print "tempcost" , tempCost
+
+                # pushing child to frontier along with the cumalative cost for reaching to that state
                 nodePriorityQueue.push(child,tempCost)
 
     else:
@@ -180,27 +228,48 @@ def nullHeuristic(state, problem=None):
 def aStarSearch(problem, heuristic=nullHeuristic):
     """Search the node that has the lowest combined cost and heuristic first."""
     "*** YOUR CODE HERE ***"
+
+    # defining start state of the probelm
     startState = [problem.getStartState(), 'Stop', 0]
-   # print startState
+
+   # Checking for goal state
     if problem.isGoalState(startState[0]):
         return startState[1]
 
+    # using priority queue data structure for storing fringe
     nodePriorityQueue = util.PriorityQueue();
+
+    # pushing start state to fringe
     nodePriorityQueue.push(startState, 0)
+
+    # Keeping all the visited nodes in a set
     exploredSet = set()
+
+
     while not nodePriorityQueue.isEmpty():
+
+        # popping the node with least cumulative cost for next action
         tempNode = nodePriorityQueue.pop()
+
+        # checking goal state only after popping the node
         if problem.isGoalState(tempNode[0]):
             return solution(tempNode)
 
+        # Checking current state or node is in explored set or not
         if tempNode[0] not in exploredSet:
+
+            # adding node to explored set
             exploredSet.add(tempNode[0])
+
             for successor in problem.getSuccessors(tempNode[0]):
+
+                # defining child node such that it stores information to reconstruct the path
                 child = [successor[0], " ".join((tempNode[1], successor[1])), 1]
                 tempList = child[1].split()
-                # print "tempList",tempList
+
+                # pushing child to frontier along with the combined cost and heuristic first for reaching to that state
                 tempCost = problem.getCostOfActions(tempList[1:]) + heuristic(child[0],problem)
-                # print "tempcost" , tempCost
+
                 nodePriorityQueue.push(child, tempCost)
 
     else:
@@ -208,6 +277,9 @@ def aStarSearch(problem, heuristic=nullHeuristic):
         return ['Stop']
         util.raiseNotDefined()
     util.raiseNotDefined()
+
+
+# Returning list removing the first node
 
 def solution(x):
     tempList  = x[1].split()
