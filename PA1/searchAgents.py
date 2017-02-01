@@ -371,7 +371,7 @@ def cornersHeuristic(state, problem):
     """
     corners = problem.corners # These are the corner coordinates
     walls = problem.walls # These are the walls of the maze, as a Grid (game.py)
-    gameSt = problem.cornerGameState
+
     cornersRemaining = list(state[1])
     currentState = state[0]
     #print "typeof", type(cornersRemaining)
@@ -501,8 +501,67 @@ def foodHeuristic(state, problem):
     problem.heuristicInfo['wallCount']
     """
     position, foodGrid = state
+    gameState = problem.startingGameState
+    foodRemaining = foodGrid.asList()
+    foodRemaining2 = foodGrid.asList()
+    #print "------------------------------------start"
+    #print "food remaining" , len(foodRemaining)
+    currentState = state[0]
+    sumoftotal =0
+    nearestCornerDistace = 0
+    nearestCorner =  state[0]
+    foodList = []
+    for foodrem in foodRemaining:
+        #print "foodrem",foodrem
+        tempdisbetweenfoods = 0
+        foodRemaining2 = foodGrid.asList()
+
+       # print "foodRemainingLength", len(foodRemaining)
+
+        tempdisbetweenfoods = manhattanDistance(state[0],foodrem) + costFromOneState(foodrem,foodRemaining2,gameState)
+       # print "foodRemainingLengthAfter", len(foodRemaining)
+       # print 'inside for foodlist',foodList
+        foodList.append(tempdisbetweenfoods)
+
+    # print "foodlist", foodList
+    # "foodlistmin" , min(foodList)
+    # if len(foodRemaining) != 0:
+    #  nearestCorner = foodRemaining[0]
+    #  nearestCornerDistace = manhattanDistance(state[0],foodRemaining[0])
+    #  for cornerRem in foodRemaining:
+    #          tempDistance = manhattanDistance(state[0],cornerRem)
+    #          if nearestCornerDistace > tempDistance:
+    #              nearestCornerDistace = tempDistance
+    #              nearestCorner = cornerRem
+    ###################################33
+
+    # while len(foodRemaining)!=0:
+    #     #print "lenfth" , len(cornersRemaining)
+    #     nearestCorner = foodRemaining[0]
+    #     nearestCornerDistace = manhattanDistance(currentState,foodRemaining[0])
+    #     for cornerRem in foodRemaining:
+    #         tempDistance = manhattanDistance(currentState, cornerRem)
+    #         if nearestCornerDistace> tempDistance:
+    #             nearestCornerDistace = tempDistance
+    #             nearestCorner = cornerRem
+    #
+    #     #print "outside for"
+    #     sumoftotal = sumoftotal + nearestCornerDistace
+    #     currentState = nearestCorner
+    #     foodRemaining.remove(nearestCorner)
+
+    #
+    # print "sumoftotal" , sumoftotal
     "*** YOUR CODE HERE ***"
-    return 0
+    if len(foodList)==0:
+        #print "empty"
+        return 0
+    else:
+        #print foodList
+        #print "foodListLength", len(foodList)
+
+        #print "---------------------------------------------"
+        return min(foodList)
 
 class ClosestDotSearchAgent(SearchAgent):
     "Search for all food using a sequence of searches"
@@ -593,4 +652,32 @@ def mazeDistance(point1, point2, gameState):
 def manhattanDistance(xy1, xy2, info={}):
     "The Manhattan distance heuristic for a PositionSearchProblem"
 
-    return abs(xy1[0] - xy2[0]) + abs(xy1[1] - xy2[1])
+    return (abs(xy1[0] - xy2[0]) + abs(xy1[1] - xy2[1]))
+
+
+def eucleadDistance(xy1,xy2):
+    return ((xy1[0] - xy2[0]) ** 2 + (xy1[1] - xy2[1]) ** 2)
+
+def costFromOneState(state,foodRemain,gameStat):
+    currentState= state
+    sumoftotal =0
+    foodRemain.remove(state)
+    while len(foodRemain)!=0:
+        #print "lenfth" , len(cornersRemaining)
+        nearestCorner = foodRemain[0]
+        nearestCornerDistace = manhattanDistance(currentState,foodRemain[0])
+        for cornerRem in foodRemain:
+
+                tempDistance = manhattanDistance(currentState, cornerRem)
+                if nearestCornerDistace> tempDistance:
+                    nearestCornerDistace = tempDistance
+                    nearestCorner = cornerRem
+
+        #print "outside for"
+        sumoftotal = sumoftotal + nearestCornerDistace
+        currentState = nearestCorner
+        foodRemain.remove(nearestCorner)
+
+
+    #print "sumoftotal" , sumoftotal
+    return sumoftotal
