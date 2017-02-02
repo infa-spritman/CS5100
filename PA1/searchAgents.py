@@ -334,7 +334,7 @@ class CornersProblem(search.SearchProblem):
                # print 'tempTuple', tempTuple
                 #print 'tempTupleType', type(tempTuple)
 
-                tempSet.discard(tempTuple)
+                tempSet.discard(tempTuple) # removing if next state is one of the corners
                 successors.append((((nextx, nexty), tuple(tempSet)), action, 1))
 
             "*** YOUR CODE HERE ***"
@@ -374,12 +374,10 @@ def cornersHeuristic(state, problem):
 
     cornersRemaining = list(state[1])
     currentState = state[0]
-    #print "typeof", type(cornersRemaining)
     nearestCornerDistace =0
-    sumoftotal = 0
+    totalDistance = 0
 
     while len(cornersRemaining)!=0:
-        #print "lenfth" , len(cornersRemaining)
         nearestCorner = cornersRemaining[0]
         nearestCornerDistace = manhattanDistance(currentState,cornersRemaining[0])
         for cornerRem in cornersRemaining:
@@ -388,27 +386,12 @@ def cornersHeuristic(state, problem):
                 nearestCornerDistace = tempDistance
                 nearestCorner = cornerRem
 
-        #print "outside for"
-        sumoftotal = sumoftotal + nearestCornerDistace
+        totalDistance = totalDistance + nearestCornerDistace
         currentState = nearestCorner
         cornersRemaining.remove(nearestCorner)
 
-    # if len(cornersRemaining) != 0:
-    #     nearestCorner = cornersRemaining[0]
-    #     nearestCornerDistace = mazeDistance(state[0],cornersRemaining[0],gameSt)
-    #     for cornerRem in cornersRemaining:
-    #         tempDistance = mazeDistance(state[0],cornerRem,gameSt)
-    #         if nearestCornerDistace > tempDistance:
-    #             nearestCornerDistace = tempDistance
 
-        #sumoftotal = sumoftotal + nearestCornerDistace
-    #print "corners" , corners[0]
-   # all_min_list=[manhattanDistance(state[0],corners[0]),manhattanDistance(state[0],corners[1]),manhattanDistance(state[0],corners[2]),manhattanDistance(state[0],corners[3])]
-    #index_min = min(xrange(len(all_min_list)), key=all_min_list.__getitem__)
-     #   "*** YOUR CODE HERE ***"
-   # all_min_list2 = [mazeDistance(state[0],corners[0],gameState),mazeDistance(state[0],corners[1],gameState),mazeDistance(state[0],corners[2],gameState),mazeDistance(state[0],corners[3],gameState)]
-    #a  = min(all_min_list2) return a
-    return sumoftotal # Default to trivial solution
+    return totalDistance # Default to trivial solution
 
 class AStarCornersAgent(SearchAgent):
     "A SearchAgent for FoodSearchProblem using A* and your foodHeuristic"
@@ -504,63 +487,26 @@ def foodHeuristic(state, problem):
     gameState = problem.startingGameState
     foodRemaining = foodGrid.asList()
     foodRemaining2 = foodGrid.asList()
-    #print "------------------------------------start"
-    #print "food remaining" , len(foodRemaining)
     currentState = state[0]
     sumoftotal =0
     nearestCornerDistace = 0
     nearestCorner =  state[0]
-    foodList = []
+
+    foodList = [] # storing the rank of total cost for all food remaining
     for foodrem in foodRemaining:
-        #print "foodrem",foodrem
+
         tempdisbetweenfoods = 0
         foodRemaining2 = foodGrid.asList()
 
-       # print "foodRemainingLength", len(foodRemaining)
+        tempdisbetweenfoods = manhattanDistance(state[0],foodrem) + costFromOneState(foodrem,foodRemaining2,gameState)
 
-        tempdisbetweenfoods = mazeDistance(state[0],foodrem,gameState) + costFromOneState(foodrem,foodRemaining2,gameState)
-       # print "foodRemainingLengthAfter", len(foodRemaining)
-       # print 'inside for foodlist',foodList
         foodList.append(tempdisbetweenfoods)
 
-    # print "foodlist", foodList
-    # "foodlistmin" , min(foodList)
-    # if len(foodRemaining) != 0:
-    #  nearestCorner = foodRemaining[0]
-    #  nearestCornerDistace = manhattanDistance(state[0],foodRemaining[0])
-    #  for cornerRem in foodRemaining:
-    #          tempDistance = manhattanDistance(state[0],cornerRem)
-    #          if nearestCornerDistace > tempDistance:
-    #              nearestCornerDistace = tempDistance
-    #              nearestCorner = cornerRem
-    ###################################33
 
-    # while len(foodRemaining)!=0:
-    #     #print "lenfth" , len(cornersRemaining)
-    #     nearestCorner = foodRemaining[0]
-    #     nearestCornerDistace = manhattanDistance(currentState,foodRemaining[0])
-    #     for cornerRem in foodRemaining:
-    #         tempDistance = manhattanDistance(currentState, cornerRem)
-    #         if nearestCornerDistace> tempDistance:
-    #             nearestCornerDistace = tempDistance
-    #             nearestCorner = cornerRem
-    #
-    #     #print "outside for"
-    #     sumoftotal = sumoftotal + nearestCornerDistace
-    #     currentState = nearestCorner
-    #     foodRemaining.remove(nearestCorner)
-
-    #
-    # print "sumoftotal" , sumoftotal
     "*** YOUR CODE HERE ***"
     if len(foodList)==0:
-        #print "empty"
         return 0
     else:
-        #print foodList
-        #print "foodListLength", len(foodList)
-
-        #print "---------------------------------------------"
         return min(foodList)
 
 class ClosestDotSearchAgent(SearchAgent):
@@ -665,10 +611,10 @@ def costFromOneState(state,foodRemain,gameStat):
     while len(foodRemain)!=0:
         #print "lenfth" , len(cornersRemaining)
         nearestCorner = foodRemain[0]
-        nearestCornerDistace = mazeDistance(currentState,foodRemain[0],gameStat)
+        nearestCornerDistace = manhattanDistance(currentState,foodRemain[0])
         for cornerRem in foodRemain:
 
-                tempDistance = mazeDistance(currentState, cornerRem,gameStat)
+                tempDistance = manhattanDistance(currentState, cornerRem)
                 if nearestCornerDistace> tempDistance:
                     nearestCornerDistace = tempDistance
                     nearestCorner = cornerRem
