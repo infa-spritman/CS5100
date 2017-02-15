@@ -87,17 +87,8 @@ class ReflexAgent(Agent):
             for newFd in newFoodAsList:
                 sumOfDistanceToFood.append(manhattanDistance(newPos, newFd))
 
-
-
-                # fooddistanceIntensity = 999999 - min(sumOfDistanceToFood)
-                # ghostdistanceIntensity = 999999 + min(sumOfDistanceToGhost)
-
-
-                # score =  successorGameState.getScore() + max(sumOfDistanceToFood) + max(sumOfDistanceToGhost)
-                # "*** YOUR CODE HERE ***"
-                # print "score:",successorGameState.getScore()-sumOfDistanceToFood + sumOfDistanceToGhost
             return successorGameState.getScore() + 10 / min(sumOfDistanceToFood) - (
-                30 * (1 / (min(sumOfDistanceToGhost) + .2)))
+                30 * (1 / (min(sumOfDistanceToGhost)+.1)))
         else:
             return 99999
 
@@ -446,47 +437,47 @@ def betterEvaluationFunction(currentGameState):
     newFoodAsList = newFood.asList()
     newGhostPositions = currentGameState.getGhostPositions()
     capsules  = currentGameState.getCapsules()
+	# distance to every food remanining
     sumOfDistanceToFood = []
+	# distance to ghost
     sumOfDistanceToGhost = []
+	
+	# distance to every capsule i.e power pallets in the game
     sumOfDistanceToCapsule = []
     # print 'new pos:', newPos
     # print 'newFood:', newFoodAsList
     # print  'newScaredTimes', newScaredTimes
-
+		
+	# appending distance to every ghost in the scene	
     for newGh in newGhostPositions:
         sumOfDistanceToGhost.append(manhattanDistance(newPos, newGh))
-
+	
+	# appending distance to every capsule in the scene
     for cap in capsules:
         sumOfDistanceToCapsule.append(manhattanDistance(newPos, cap))
+	
+	# returning evaluation when there are food pallets remaining
     if len(newFoodAsList) > 0:
-
+	
+        # appending distance to every pallet in the scene
         for newFd in newFoodAsList:
             sumOfDistanceToFood.append(manhattanDistance(newPos, newFd))
-
+        
+		# if minimum distance to ghost is less than equal to 1 , then run away from ghost
         if min(sumOfDistanceToGhost)<=1:
             return -99999;
-
-
-
-
-
-
-
-
-
-
-
-
-            # fooddistanceIntensity = 999999 - min(sumOfDistanceToFood)
-            # ghostdistanceIntensity = 999999 + min(sumOfDistanceToGhost)
-
-
-            # score =  successorGameState.getScore() + max(sumOfDistanceToFood) + max(sumOfDistanceToGhost)
-            # "*** YOUR CODE HERE ***"
-            # print "score:",successorGameState.getScore()-sumOfDistanceToFood + sumOfDistanceToGhost
-        return currentGameState.getScore() + 10.7 / min(sumOfDistanceToFood) - (
-            27.7 * (1 / (min(sumOfDistanceToGhost) + .2)))
+        
+		# if ghost is scared then eat the ghost, therby putting high coefficient to distance nearest ghost
+        if newScaredTimes[0] > 0:
+            return currentGameState.getScore() + 10.7 / min(sumOfDistanceToFood) +  (80 * (1 / (min(sumOfDistanceToGhost) + .2)))
+		
+		# else eval the state using minimum distance to food and minimum distance to ghost
+        else:
+            return currentGameState.getScore() + 10.7 / min(sumOfDistanceToFood) - (27.7 * (1 / (min(sumOfDistanceToGhost) + .2)))
+			
+			# magnitude of coefficients is decided by trial and error 
     else:
+		# when there are no pallets then return max value
         return 99999
 
 
@@ -499,20 +490,20 @@ def manhattanDistance(xy1, xy2, info={}):
 
     return (abs(xy1[0] - xy2[0]) + abs(xy1[1] - xy2[1]))
 
-def mazeDistance(point1, point2, gameState):
-    """
-    Returns the maze distance between any two points, using the search functions
-    you have already built. The gameState can be any game state -- Pacman's
-    position in that state is ignored.
-
-    Example usage: mazeDistance( (2,4), (5,6), gameState)
-
-    This might be a useful helper function for your ApproximateSearchAgent.
-    """
-    x1, y1 = point1
-    x2, y2 = point2
-    walls = gameState.getWalls()
-    assert not walls[x1][y1], 'point1 is a wall: ' + str(point1)
-    assert not walls[x2][y2], 'point2 is a wall: ' + str(point2)
-    prob = search.SearchProblem(gameState, start=point1, goal=point2, warn=False, visualize=False)
-    return len(search.bfs(prob))
+# def mazeDistance(point1, point2, gameState):
+#     """
+#     Returns the maze distance between any two points, using the search functions
+#     you have already built. The gameState can be any game state -- Pacman's
+#     position in that state is ignored.
+#
+#     Example usage: mazeDistance( (2,4), (5,6), gameState)
+#
+#     This might be a useful helper function for your ApproximateSearchAgent.
+#     """
+#     x1, y1 = point1
+#     x2, y2 = point2
+#     walls = gameState.getWalls()
+#     assert not walls[x1][y1], 'point1 is a wall: ' + str(point1)
+#     assert not walls[x2][y2], 'point2 is a wall: ' + str(point2)
+#     prob = search.SearchProblem(gameState, start=point1, goal=point2, warn=False, visualize=False)
+#     return len(search.bfs(prob))
