@@ -71,6 +71,9 @@ class QLearningAgent(ReinforcementAgent):
         "*** YOUR CODE HERE ***"
         bestac = self.computeActionFromQValues(state)
 
+        if bestac==None:
+            return 0
+
 
 
         return self.getQValue(state,bestac)
@@ -144,8 +147,7 @@ class QLearningAgent(ReinforcementAgent):
                                                                                    self.getQValue(state, action)))
 
         "*** YOUR CODE HERE ***"
-        return self.val[(state, action)]
-        util.raiseNotDefined()
+        #return self.val[(state, action)]
 
     def getPolicy(self, state):
         return self.computeActionFromQValues(state)
@@ -199,6 +201,7 @@ class ApproximateQAgent(PacmanQAgent):
         PacmanQAgent.__init__(self, **args)
         self.weights = util.Counter()
 
+
     def getWeights(self):
         return self.weights
 
@@ -207,6 +210,13 @@ class ApproximateQAgent(PacmanQAgent):
           Should return Q(state,action) = w * featureVector
           where * is the dotProduct operator
         """
+        #print "state", state[0]
+
+        #print "weights inside getQ" , self.getWeights()
+
+
+
+        return self.getWeights().__mul__(self.featExtractor.getFeatures(state,action))
         "*** YOUR CODE HERE ***"
         util.raiseNotDefined()
 
@@ -214,8 +224,28 @@ class ApproximateQAgent(PacmanQAgent):
         """
            Should update your weights based on transition
         """
+        difference = self.alpha * (reward +
+                                    (
+                                        self.discount * self.computeValueFromQValues(
+                                            nextState)) -
+                                    self.getQValue(state, action))
+
+        secondTerm = self.featExtractor.getFeatures(state,action)
+
+        #print "secondTerm" , secondTerm
+
+        for key in secondTerm:
+            secondTerm[key] *= difference
+
+        for key in secondTerm:
+            #print 'key' , key
+            #print  'weight:key' , self.weights[key]
+            self.weights[key] = self.weights[key] + secondTerm[key]
+
+
+
         "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+        #util.raiseNotDefined()
 
     def final(self, state):
         "Called at the end of each game."
@@ -226,4 +256,5 @@ class ApproximateQAgent(PacmanQAgent):
         if self.episodesSoFar == self.numTraining:
             # you might want to print your weights here for debugging
             "*** YOUR CODE HERE ***"
+            print "Weights" , self.weights
             pass
