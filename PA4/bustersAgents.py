@@ -18,6 +18,7 @@ from game import Directions
 from keyboardAgents import KeyboardAgent
 import inference
 import busters
+import random
 
 class NullGraphics:
     "Placeholder for graphics"
@@ -157,10 +158,36 @@ class GreedyBustersAgent(BustersAgent):
              gameState.getLivingGhosts() list.
         """
         pacmanPosition = gameState.getPacmanPosition()
+        # Collect legal moves and successor states
         legal = [a for a in gameState.getLegalPacmanActions()]
         livingGhosts = gameState.getLivingGhosts()
         livingGhostPositionDistributions = \
             [beliefs for i, beliefs in enumerate(self.ghostBeliefs)
              if livingGhosts[i+1]]
         "*** YOUR CODE HERE ***"
+        #print "living ghosts", livingGhosts
+        #print "living ghosts dis", livingGhostPositionDistributions[0]
+        ghostpos = [ max(templgpsd, key=templgpsd.get) for templgpsd in livingGhostPositionDistributions]
+        #print "ghostpos", ghostpos
+        #print "pacmanpos", pacmanPosition
+
+        ghostdistance = [self.distancer.getDistance(pacmanPosition,gp) for gp in ghostpos]
+        #print "ghostdistance", ghostdistance
+
+        closedghostdist = min(ghostdistance)
+        bestGhostIndices = [index for index in range(len(ghostdistance)) if ghostdistance[index] == closedghostdist]
+        chosenGhostIndex = random.choice(bestGhostIndices)  # Pick randomly among the best
+        #print "index", chosenGhostIndex
+
+        closestghostPos = ghostpos[chosenGhostIndex]
+
+        #print "cgs", closestghostPos
+
+        scores = [self.distancer.getDistance(Actions.getSuccessor(pacmanPosition,action),closestghostPos) for
+                  action in legal]
+        bestScore = min(scores)
+        bestIndices = [index for index in range(len(scores)) if scores[index] == bestScore]
+        chosenIndex = random.choice(bestIndices)  # Pick randomly among the best
+
+        return legal[chosenIndex]
         util.raiseNotDefined()
