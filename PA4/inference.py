@@ -1,16 +1,12 @@
 # inference.py
 # ------------
-# Licensing Information:  You are free to use or extend these projects for
-# educational purposes provided that (1) you do not distribute or publish
-# solutions, (2) you retain this notice, and (3) you provide clear
-# attribution to UC Berkeley, including a link to http://ai.berkeley.edu.
-# 
-# Attribution Information: The Pacman AI projects were developed at UC Berkeley.
-# The core projects and autograders were primarily created by John DeNero
-# (denero@cs.berkeley.edu) and Dan Klein (klein@cs.berkeley.edu).
-# Student side autograding was added by Brad Miller, Nick Hay, and
-# Pieter Abbeel (pabbeel@cs.berkeley.edu).
-
+# Licensing Information: Please do not distribute or publish solutions to this
+# project. You are free to use and extend these projects for educational
+# purposes. The Pacman AI projects were developed at UC Berkeley, primarily by
+# John DeNero (denero@cs.berkeley.edu) and Dan Klein (klein@cs.berkeley.edu).
+# Student side autograding was added by Brad Miller, Nick Hay, and Pieter
+# Abbeel in Spring 2013.
+# For more info, see http://inst.eecs.berkeley.edu/~cs188/pacman/pacman.html
 
 import itertools
 import util
@@ -39,11 +35,9 @@ class InferenceModule:
 
     def getPositionDistribution(self, gameState):
         """
-        Returns a distribution over successor positions of the ghost from the
-        given gameState.
+        Returns a distribution over successor positions of the ghost from the given gameState.
 
-        You must first place the ghost in the gameState, using setGhostPosition
-        below.
+        You must first place the ghost in the gameState, using setGhostPosition below.
         """
         ghostPosition = gameState.getGhostPosition(self.index) # The position you set
         actionDist = self.ghostAgent.getDistribution(gameState)
@@ -55,17 +49,17 @@ class InferenceModule:
 
     def setGhostPosition(self, gameState, ghostPosition):
         """
-        Sets the position of the ghost for this inference module to the
-        specified position in the supplied gameState.
+        Sets the position of the ghost for this inference module to the specified
+        position in the supplied gameState.
 
         Note that calling setGhostPosition does not change the position of the
         ghost in the GameState object used for tracking the true progression of
-        the game.  The code in inference.py only ever receives a deep copy of
-        the GameState object which is responsible for maintaining game state,
-        not a reference to the original object.  Note also that the ghost
-        distance observations are stored at the time the GameState object is
-        created, so changing the position of the ghost will not affect the
-        functioning of observeState.
+        the game.  The code in inference.py only ever receives a deep copy of the
+        GameState object which is responsible for maintaining game state, not a
+        reference to the original object.  Note also that the ghost distance
+        observations are stored at the time the GameState object is created, so
+        changing the position of the ghost will not affect the functioning of
+        observeState.
         """
         conf = game.Configuration(ghostPosition, game.Directions.STOP)
         gameState.data.agentStates[self.index] = game.AgentState(conf, False)
@@ -103,15 +97,15 @@ class InferenceModule:
 
     def getBeliefDistribution(self):
         """
-        Returns the agent's current belief state, a distribution over ghost
-        locations conditioned on all evidence so far.
+        Returns the agent's current belief state, a distribution over
+        ghost locations conditioned on all evidence so far.
         """
         pass
 
 class ExactInference(InferenceModule):
     """
-    The exact dynamic inference module should use forward-algorithm updates to
-    compute the exact belief function at each time step.
+    The exact dynamic inference module should use forward-algorithm
+    updates to compute the exact belief function at each time step.
     """
 
     def initializeUniformly(self, gameState):
@@ -124,25 +118,23 @@ class ExactInference(InferenceModule):
         """
         Updates beliefs based on the distance observation and Pacman's position.
 
-        The noisyDistance is the estimated Manhattan distance to the ghost you
-        are tracking.
+        The noisyDistance is the estimated manhattan distance to the ghost you are tracking.
 
-        The emissionModel below stores the probability of the noisyDistance for
-        any true distance you supply. That is, it stores P(noisyDistance |
-        TrueDistance).
+        The emissionModel below stores the probability of the noisyDistance for any true
+        distance you supply.  That is, it stores P(noisyDistance | TrueDistance).
 
         self.legalPositions is a list of the possible ghost positions (you
         should only consider positions that are in self.legalPositions).
 
         A correct implementation will handle the following special case:
-          *  When a ghost is captured by Pacman, all beliefs should be updated
-             so that the ghost appears in its prison cell, position
-             self.getJailPosition()
+          *  When a ghost is captured by Pacman, all beliefs should be updated so
+             that the ghost appears in its prison cell, position self.getJailPosition()
 
              You can check if a ghost has been captured by Pacman by
              checking if it has a noisyDistance of None (a noisy distance
              of None will be returned if, and only if, the ghost is
              captured).
+
         """
         noisyDistance = observation
         emissionModel = busters.getObservationDistribution(noisyDistance)
@@ -159,24 +151,22 @@ class ExactInference(InferenceModule):
         # and noisyDistance is None
         allPossible = util.Counter()
 
-        if noisyDistance==None:
+        if noisyDistance == None:
             for p in self.legalPositions:
                 trueDistance = util.manhattanDistance(p, pacmanPosition)
-                #print "emission" , emissionModel[trueDistance]
-                #print "self and p" , self.getJailPosition()," ",p
+                # print "emission" , emissionModel[trueDistance]
+                # print "self and p" , self.getJailPosition()," ",p
                 # if self.getJailPosition()==p:
                 #         print "x,y" ,p
-                allPossible[p]=0
-            allPossible[self.getJailPosition()] =1
+                allPossible[p] = 0
+            allPossible[self.getJailPosition()] = 1
 
         else:
             for p in self.legalPositions:
                 trueDistance = util.manhattanDistance(p, pacmanPosition)
-            #print "emission" , emissionModel[trueDistance]
+                # print "emission" , emissionModel[trueDistance]
                 if emissionModel[trueDistance] > 0:
-                        allPossible[p] = emissionModel[trueDistance]*self.beliefs[p]
-
-
+                    allPossible[p] = emissionModel[trueDistance] * self.beliefs[p]
 
         "*** END YOUR CODE HERE ***"
 
@@ -185,65 +175,63 @@ class ExactInference(InferenceModule):
 
     def elapseTime(self, gameState):
         """
-        Update self.beliefs in response to a time step passing from the current
-        state.
+        Update self.beliefs in response to a time step passing from the current state.
 
-        The transition model is not entirely stationary: it may depend on
-        Pacman's current position (e.g., for DirectionalGhost).  However, this
-        is not a problem, as Pacman's current position is known.
+        The transition model is not entirely stationary: it may depend on Pacman's
+        current position (e.g., for DirectionalGhost).  However, this is not a problem,
+        as Pacman's current position is known.
 
-        In order to obtain the distribution over new positions for the ghost,
-        given its previous position (oldPos) as well as Pacman's current
-        position, use this line of code:
+        In order to obtain the distribution over new positions for the
+        ghost, given its previous position (oldPos) as well as Pacman's
+        current position, use this line of code:
 
           newPosDist = self.getPositionDistribution(self.setGhostPosition(gameState, oldPos))
 
-        Note that you may need to replace "oldPos" with the correct name of the
-        variable that you have used to refer to the previous ghost position for
-        which you are computing this distribution. You will need to compute
+        Note that you may need to replace "oldPos" with the correct name
+        of the variable that you have used to refer to the previous ghost
+        position for which you are computing this distribution. You will need to compute
         multiple position distributions for a single update.
 
-        newPosDist is a util.Counter object, where for each position p in
-        self.legalPositions,
+        newPosDist is a util.Counter object, where for each position p in self.legalPositions,
 
         newPostDist[p] = Pr( ghost is at position p at time t + 1 | ghost is at position oldPos at time t )
 
-        (and also given Pacman's current position).  You may also find it useful
-        to loop over key, value pairs in newPosDist, like:
+        (and also given Pacman's current position).  You may also find it useful to loop over key, value pairs
+        in newPosDist, like:
 
           for newPos, prob in newPosDist.items():
             ...
 
         *** GORY DETAIL AHEAD ***
 
-        As an implementation detail (with which you need not concern yourself),
-        the line of code at the top of this comment block for obtaining
-        newPosDist makes use of two helper methods provided in InferenceModule
-        above:
+        As an implementation detail (with which you need not concern
+        yourself), the line of code at the top of this comment block for obtaining newPosDist makes
+        use of two helper methods provided in InferenceModule above:
 
           1) self.setGhostPosition(gameState, ghostPosition)
-              This method alters the gameState by placing the ghost we're
-              tracking in a particular position.  This altered gameState can be
-              used to query what the ghost would do in this position.
+              This method alters the gameState by placing the ghost we're tracking
+              in a particular position.  This altered gameState can be used to query
+              what the ghost would do in this position.
 
           2) self.getPositionDistribution(gameState)
-              This method uses the ghost agent to determine what positions the
-              ghost will move to from the provided gameState.  The ghost must be
-              placed in the gameState with a call to self.setGhostPosition
-              above.
+              This method uses the ghost agent to determine what positions the ghost
+              will move to from the provided gameState.  The ghost must be placed
+              in the gameState with a call to self.setGhostPosition above.
 
-        It is worthwhile, however, to understand why these two helper methods
-        are used and how they combine to give us a belief distribution over new
-        positions after a time update from a particular position.
+        It is worthwhile, however, to understand why these two helper methods are used and how they
+        combine to give us a belief distribution over new positions after a time update from a particular position
         """
-        allPossible = util.Counter()
-        for p in self.legalPositions:
-            newPosDist = self.getPositionDistribution(self.setGhostPosition(gameState, p))
-            for newPos, prob in newPosDist.items():
-                allPossible[newPos] += newPosDist[newPos]*(self.beliefs[p])
 
         "*** YOUR CODE HERE ***"
-        self.beliefs = allPossible
+
+        aposs = util.Counter()
+        for p in self.legalPositions:
+            currentDist = self.getPositionDistribution(self.setGhostPosition(gameState, p))
+            for newPos, prob in currentDist.items():
+                aposs[newPos] += currentDist[newPos] * (self.beliefs[p])
+
+        "*** YOUR CODE HERE ***"
+        self.beliefs = aposs
 
     def getBeliefDistribution(self):
         return self.beliefs
@@ -252,10 +240,11 @@ class ParticleFilter(InferenceModule):
     """
     A particle filter for approximately tracking a single ghost.
 
-    Useful helper functions will include random.choice, which chooses an element
-    from a list uniformly at random, and util.sample, which samples a key from a
-    Counter by treating its values as probabilities.
+    Useful helper functions will include random.choice, which chooses
+    an element from a list uniformly at random, and util.sample, which
+    samples a key from a Counter by treating its values as probabilities.
     """
+
 
     def __init__(self, ghostAgent, numParticles=300):
         InferenceModule.__init__(self, ghostAgent);
@@ -267,50 +256,90 @@ class ParticleFilter(InferenceModule):
 
     def initializeUniformly(self, gameState):
         """
-        Initializes a list of particles. Use self.numParticles for the number of
-        particles. Use self.legalPositions for the legal board positions where a
-        particle could be located.  Particles should be evenly (not randomly)
-        distributed across positions in order to ensure a uniform prior.
+          Initializes a list of particles. Use self.numParticles for the number of particles.
+          Use self.legalPositions for the legal board positions where a particle could be located.
+          Particles should be evenly (not randomly) distributed across positions in order to
+          ensure a uniform prior.
 
-        Note: the variable you store your particles in must be a list; a list is
-        simply a collection of unweighted variables (positions in this case).
-        Storing your particles as a Counter (where there could be an associated
-        weight with each position) is incorrect and may produce errors.
+          ** NOTE **
+            the variable you store your particles in must be a list; a list is simply a collection
+            of unweighted variables (positions in this case). Storing your particles as a Counter or
+            dictionary (where there could be an associated weight with each position) is incorrect
+            and will produce errors
         """
         "*** YOUR CODE HERE ***"
+        #print "number of partilces", self.numParticles
+        #print "number of legalpostion", len(self.legalPositions)
+        self.listOfparticles = []
+        for i in range(0,self.numParticles,len(self.legalPositions)):
+            #print "range-i", i
+            for j in range(len(self.legalPositions)):
+                #print "range-i+j", i+j , "i :", i, " j:",j
+                self.listOfparticles.append(self.legalPositions[j])
 
     def observe(self, observation, gameState):
         """
-        Update beliefs based on the given distance observation. Make sure to
-        handle the special case where all particles have weight 0 after
-        reweighting based on observation. If this happens, resample particles
-        uniformly at random from the set of legal positions
-        (self.legalPositions).
+        Update beliefs based on the given distance observation. Make
+        sure to handle the special case where all particles have weight
+        0 after reweighting based on observation. If this happens,
+        resample particles uniformly at random from the set of legal
+        positions (self.legalPositions).
 
         A correct implementation will handle two special cases:
-          1) When a ghost is captured by Pacman, all particles should be updated
-             so that the ghost appears in its prison cell,
-             self.getJailPosition()
+          1) When a ghost is captured by Pacman, **all** particles should be updated so
+             that the ghost appears in its prison cell, self.getJailPosition()
 
-             As before, you can check if a ghost has been captured by Pacman by
-             checking if it has a noisyDistance of None.
+             You can check if a ghost has been captured by Pacman by
+             checking if it has a noisyDistance of None (a noisy distance
+             of None will be returned if, and only if, the ghost is
+             captured).
 
-          2) When all particles receive 0 weight, they should be recreated from
-             the prior distribution by calling initializeUniformly. The total
-             weight for a belief distribution can be found by calling totalCount
-             on a Counter object
+          2) When all particles receive 0 weight, they should be recreated from the
+             prior distribution by calling initializeUniformly. The total weight
+             for a belief distribution can be found by calling totalCount on
+             a Counter object
 
         util.sample(Counter object) is a helper method to generate a sample from
-        a belief distribution.
+        a belief distribution
 
-        You may also want to use util.manhattanDistance to calculate the
-        distance between a particle and Pacman's position.
+        You may also want to use util.manhattanDistance to calculate the distance
+        between a particle and pacman's position.
         """
+
         noisyDistance = observation
         emissionModel = busters.getObservationDistribution(noisyDistance)
         pacmanPosition = gameState.getPacmanPosition()
-        "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+
+        allpossible = util.Counter()
+
+        if noisyDistance==None:
+            newList =[]
+            for i in range(self.numParticles):
+                 newList.append(self.getJailPosition())
+            self.listOfparticles = newList
+            #print self.getBeliefDistribution();
+            # self.listOfparticles = []
+            # for i in range(self.numParticles):
+            #     self.listOfparticles.append(self.getJailPosition())
+
+        else:
+            oldb = self.getBeliefDistribution()
+            for lp in self.legalPositions:
+                trueDistance = util.manhattanDistance(lp, pacmanPosition)
+                # print "emission" , emissionModel[trueDistance]
+                #if emissionModel[trueDistance] > 0:
+                allpossible[lp] += float(emissionModel[trueDistance])*oldb[lp]
+
+
+            if(allpossible.totalCount()==0):
+                self.initializeUniformly(gameState)
+            else:
+                newSampleList = []
+                for i in range(self.numParticles):
+                    newSampleList.append(util.sample(allpossible))
+
+                self.listOfparticles= newSampleList
+
 
     def elapseTime(self, gameState):
         """
@@ -320,46 +349,55 @@ class ParticleFilter(InferenceModule):
 
           newPosDist = self.getPositionDistribution(self.setGhostPosition(gameState, oldPos))
 
-        to obtain the distribution over new positions for the ghost, given its
-        previous position (oldPos) as well as Pacman's current position.
+        to obtain the distribution over new positions for the ghost, given
+        its previous position (oldPos) as well as Pacman's current
+        position.
 
-        util.sample(Counter object) is a helper method to generate a sample from
-        a belief distribution.
+        util.sample(Counter object) is a helper method to generate a sample from a
+        belief distribution
         """
         "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+        newSampleList =[]
+        for pt in self.listOfparticles:
+            currentDist = self.getPositionDistribution(self.setGhostPosition(gameState, pt))
+            newParticle = util.sample(currentDist)
+            newSampleList.append(newParticle)
+
+
+        self.listOfparticles = newSampleList
+
 
     def getBeliefDistribution(self):
         """
-        Return the agent's current belief state, a distribution over ghost
-        locations conditioned on all evidence and time passage. This method
-        essentially converts a list of particles into a belief distribution (a
-        Counter object)
+          Return the agent's current belief state, a distribution over
+          ghost locations conditioned on all evidence and time passage. This method
+          essentially converts a list of particles into a belief distribution (a Counter object)
         """
         "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+        allPossible = util.Counter()
+        for p in self.legalPositions:
+            allPossible[p] = float(self.listOfparticles.count(p))/len(self.listOfparticles)
+
+        if(self.listOfparticles.count(self.getJailPosition())==len(self.listOfparticles)):
+            allPossible[self.getJailPosition()] = 1.0
+        "*** YOUR CODE HERE ***"
+        return allPossible
 
 class MarginalInference(InferenceModule):
-    """
-    A wrapper around the JointInference module that returns marginal beliefs
-    about ghosts.
-    """
+    "A wrapper around the JointInference module that returns marginal beliefs about ghosts."
 
     def initializeUniformly(self, gameState):
         "Set the belief state to an initial, prior value."
-        if self.index == 1:
-            jointInference.initialize(gameState, self.legalPositions)
+        if self.index == 1: jointInference.initialize(gameState, self.legalPositions)
         jointInference.addGhostAgent(self.ghostAgent)
 
     def observeState(self, gameState):
         "Update beliefs based on the given distance observation and gameState."
-        if self.index == 1:
-            jointInference.observeState(gameState)
+        if self.index == 1: jointInference.observeState(gameState)
 
     def elapseTime(self, gameState):
         "Update beliefs for a time step elapsing from a gameState."
-        if self.index == 1:
-            jointInference.elapseTime(gameState)
+        if self.index == 1: jointInference.elapseTime(gameState)
 
     def getBeliefDistribution(self):
         "Returns the marginal belief over a particular ghost by summing out the others."
@@ -370,10 +408,7 @@ class MarginalInference(InferenceModule):
         return dist
 
 class JointParticleFilter:
-    """
-    JointParticleFilter tracks a joint distribution over tuples of all ghost
-    positions.
-    """
+    "JointParticleFilter tracks a joint distribution over tuples of all ghost positions."
 
     def __init__(self, numParticles=600):
         self.setNumParticles(numParticles)
@@ -393,29 +428,35 @@ class JointParticleFilter:
         Initialize particles to be consistent with a uniform prior.
 
         Each particle is a tuple of ghost positions. Use self.numParticles for
-        the number of particles. You may find the `itertools` package helpful.
+        the number of particles. You may find the python package 'itertools' helpful.
         Specifically, you will need to think about permutations of legal ghost
         positions, with the additional understanding that ghosts may occupy the
-        same space. Look at the `itertools.product` function to get an
-        implementation of the Cartesian product.
+        same space. Look at the 'product' function in itertools to get an
+        implementation of the catesian product. Note: If you use
+        itertools, keep in mind that permutations are not returned in a random order;
+        you must shuffle the list of permutations in order to ensure even placement
+        of particles across the board. Use self.legalPositions to obtain a list of
+        positions a ghost may occupy.
 
-        Note: If you use itertools, keep in mind that permutations are not
-        returned in a random order; you must shuffle the list of permutations in
-        order to ensure even placement of particles across the board. Use
-        self.legalPositions to obtain a list of positions a ghost may occupy.
+          ** NOTE **
+            the variable you store your particles in must be a list; a list is simply a collection
+            of unweighted variables (positions in this case). Storing your particles as a Counter or
+            dictionary (where there could be an associated weight with each position) is incorrect
+            and will produce errors
 
-        Note: the variable you store your particles in must be a list; a list is
-        simply a collection of unweighted variables (positions in this case).
-        Storing your particles as a Counter (where there could be an associated
-        weight with each position) is incorrect and may produce errors.
         """
         "*** YOUR CODE HERE ***"
+        pGhsPost = list(itertools.product(self.legalPositions, repeat = self.numGhosts))
+        random.shuffle(pGhsPost)
+        self.particles = []
+        for i in range(0, self.numParticles, len(pGhsPost)):
+            # print "range-i", i
+            for j in range(len(pGhsPost)):
+                # print "range-i+j", i+j , "i :", i, " j:",j
+                self.particles.append(pGhsPost[j])
 
     def addGhostAgent(self, agent):
-        """
-        Each ghost agent is registered separately and stored (in case they are
-        different).
-        """
+        "Each ghost agent is registered separately and stored (in case they are different)."
         self.ghostAgents.append(agent)
 
     def getJailPosition(self, i):
@@ -423,8 +464,7 @@ class JointParticleFilter:
 
     def observeState(self, gameState):
         """
-        Resamples the set of particles using the likelihood of the noisy
-        observations.
+        Resamples the set of particles using the likelihood of the noisy observations.
 
         To loop over the ghosts, use:
 
@@ -432,108 +472,145 @@ class JointParticleFilter:
             ...
 
         A correct implementation will handle two special cases:
-          1) When a ghost is captured by Pacman, all particles should be updated
-             so that the ghost appears in its prison cell, position
-             self.getJailPosition(i) where `i` is the index of the ghost.
+          1) When a ghost is captured by Pacman, all particles should be updated so
+             that the ghost appears in its prison cell, position self.getJailPosition(i)
+             where "i" is the index of the ghost.
 
-             As before, you can check if a ghost has been captured by Pacman by
-             checking if it has a noisyDistance of None.
+             You can check if a ghost has been captured by Pacman by
+             checking if it has a noisyDistance of None (a noisy distance
+             of None will be returned if, and only if, the ghost is
+             captured).
 
-          2) When all particles receive 0 weight, they should be recreated from
-             the prior distribution by calling initializeParticles. After all
-             particles are generated randomly, any ghosts that are eaten (have
-             noisyDistance of None) must be changed to the jail Position. This
-             will involve changing each particle if a ghost has been eaten.
+          2) When all particles receive 0 weight, they should be recreated from the
+              prior distribution by calling initializeParticles. After all particles
+              are generated randomly, any ghosts that are eaten (have noisyDistance of 0)
+              must be changed to the jail Position. This will involve changing each
+              particle if a ghost has been eaten.
 
-        self.getParticleWithGhostInJail is a helper method to edit a specific
-        particle. Since we store particles as tuples, they must be converted to
-        a list, edited, and then converted back to a tuple. This is a common
-        operation when placing a ghost in jail.
+        ** Remember ** We store particles as tuples, but to edit a specific particle,
+        it must be converted to a list, edited, and then converted back to a tuple. Since
+        this is a common operation when placing a ghost in the jail for a particle, we have
+        provided a helper method named self.getParticleWithGhostInJail(particle, ghostIndex)
+        that performs these three operations for you.
+
         """
         pacmanPosition = gameState.getPacmanPosition()
         noisyDistances = gameState.getNoisyGhostDistances()
-        if len(noisyDistances) < self.numGhosts:
-            return
+        if len(noisyDistances) < self.numGhosts: return
+        apt = util.Counter()
         emissionModels = [busters.getObservationDistribution(dist) for dist in noisyDistances]
 
         "*** YOUR CODE HERE ***"
 
+        for pcle in self.particles:
+            pp = 1.0
+            for j in range(self.numGhosts):
+                if noisyDistances[j] == None:
+                    pcle = self.getParticleWithGhostInJail(pcle, j)
+                else:
+                    trueDistance = util.manhattanDistance(pcle[j], pacmanPosition)
+                    pp = pp*emissionModels[j][trueDistance]
+            apt[pcle] = apt[pcle] + pp;
+
+
+        if (apt.totalCount()==0):
+            self.initializeParticles()
+            for pcle in self.particles:
+                for i in range(self.numGhosts):
+                    if noisyDistances[i] == None:
+                        pcle = self.getParticleWithGhostInJail(pcle, i)
+        else:
+            #apt.normalize()
+            for key in apt:
+                apt[key] = float(apt[key]) / len(apt)
+
+            currentDist = []
+            for i in range(self.numParticles):
+                currentDist.append(util.sample(apt))
+            self.particles = currentDist
+
     def getParticleWithGhostInJail(self, particle, ghostIndex):
-        """
-        Takes a particle (as a tuple of ghost positions) and returns a particle
-        with the ghostIndex'th ghost in jail.
-        """
         particle = list(particle)
         particle[ghostIndex] = self.getJailPosition(ghostIndex)
         return tuple(particle)
 
     def elapseTime(self, gameState):
         """
-        Samples each particle's next state based on its current state and the
-        gameState.
+        Samples each particle's next state based on its current state and the gameState.
 
         To loop over the ghosts, use:
 
           for i in range(self.numGhosts):
             ...
 
-        Then, assuming that `i` refers to the index of the ghost, to obtain the
-        distributions over new positions for that single ghost, given the list
-        (prevGhostPositions) of previous positions of ALL of the ghosts, use
-        this line of code:
+        Then, assuming that "i" refers to the index of the
+        ghost, to obtain the distributions over new positions for that
+        single ghost, given the list (prevGhostPositions) of previous
+        positions of ALL of the ghosts, use this line of code:
 
-          newPosDist = getPositionDistributionForGhost(
-             setGhostPositions(gameState, prevGhostPositions), i, self.ghostAgents[i]
-          )
+          newPosDist = getPositionDistributionForGhost(setGhostPositions(gameState, prevGhostPositions),
+                                                       i, self.ghostAgents[i])
 
-        Note that you may need to replace `prevGhostPositions` with the correct
-        name of the variable that you have used to refer to the list of the
-        previous positions of all of the ghosts, and you may need to replace `i`
-        with the variable you have used to refer to the index of the ghost for
-        which you are computing the new position distribution.
+        **Note** that you may need to replace "prevGhostPositions" with the
+        correct name of the variable that you have used to refer to the
+        list of the previous positions of all of the ghosts, and you may
+        need to replace "i" with the variable you have used to refer to
+        the index of the ghost for which you are computing the new
+        position distribution.
 
-        As an implementation detail (with which you need not concern yourself),
-        the line of code above for obtaining newPosDist makes use of two helper
-        functions defined below in this file:
+        As an implementation detail (with which you need not concern
+        yourself), the line of code above for obtaining newPosDist makes
+        use of two helper functions defined below in this file:
 
           1) setGhostPositions(gameState, ghostPositions)
-              This method alters the gameState by placing the ghosts in the
-              supplied positions.
+              This method alters the gameState by placing the ghosts in the supplied positions.
 
           2) getPositionDistributionForGhost(gameState, ghostIndex, agent)
-              This method uses the supplied ghost agent to determine what
-              positions a ghost (ghostIndex) controlled by a particular agent
-              (ghostAgent) will move to in the supplied gameState.  All ghosts
-              must first be placed in the gameState using setGhostPositions
-              above.
+              This method uses the supplied ghost agent to determine what positions
+              a ghost (ghostIndex) controlled by a particular agent (ghostAgent)
+              will move to in the supplied gameState.  All ghosts
+              must first be placed in the gameState using setGhostPositions above.
 
-              The ghost agent you are meant to supply is
-              self.ghostAgents[ghostIndex-1], but in this project all ghost
-              agents are always the same.
+              The ghost agent you are meant to supply is self.ghostAgents[ghostIndex-1],
+              but in this project all ghost agents are always the same.
         """
         newParticles = []
         for oldParticle in self.particles:
-            newParticle = list(oldParticle) # A list of ghost positions
-            # now loop through and update each entry in newParticle...
-
+            newParticle = list(oldParticle)
             "*** YOUR CODE HERE ***"
-
+            for x in range(self.numGhosts):
+                currentDist = getPositionDistributionForGhost(setGhostPositions(gameState, newParticle), x, self.ghostAgents[x])
+                newParticle[x] = util.sample(currentDist)
             "*** END YOUR CODE HERE ***"
             newParticles.append(tuple(newParticle))
         self.particles = newParticles
 
     def getBeliefDistribution(self):
-        "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+        # allPossible = util.Counter()
+        # for p in self.legalPositions:
+        #     allPossible[p] = float(self.particles.count(p))/len(self.particles)
+        #
+        # if(self.particles.count(self.getJailPosition())==len(self.particles)):
+        #     allPossible[self.getJailPosition()] = 1.0
+        # "*** YOUR CODE HERE ***"
+        # return allPossible
+        currentDistribution = util.Counter()
+        for currentParticle in self.particles:
+            currentDistribution[currentParticle] = currentDistribution[currentParticle]+1
+
+        for key in currentDistribution:
+            currentDistribution[key] = float(currentDistribution[key]) / len(self.particles)
+
+        return currentDistribution
 
 # One JointInference module is shared globally across instances of MarginalInference
 jointInference = JointParticleFilter()
 
 def getPositionDistributionForGhost(gameState, ghostIndex, agent):
     """
-    Returns the distribution over positions for a ghost, using the supplied
-    gameState.
+    Returns the distribution over positions for a ghost, using the supplied gameState.
     """
+
     # index 0 is pacman, but the students think that index 0 is the first ghost.
     ghostPosition = gameState.getGhostPosition(ghostIndex+1)
     actionDist = agent.getDistribution(gameState)
@@ -549,4 +626,3 @@ def setGhostPositions(gameState, ghostPositions):
         conf = game.Configuration(pos, game.Directions.STOP)
         gameState.data.agentStates[index + 1] = game.AgentState(conf, False)
     return gameState
-
