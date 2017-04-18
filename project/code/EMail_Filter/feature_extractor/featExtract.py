@@ -42,8 +42,8 @@ class featExtract(object):
 
     def getTestHamFeature(self):
         no_of_ham_files = len(self.ham_files)
-        train_ham_files = self.ham_files[:int(no_of_ham_files * self.proportion)]
-        self.testHamFeature = self.feature_extract(train_ham_files, 'ham', self.n_gram)
+        test_ham_files = self.ham_files[:int(no_of_ham_files * self.proportion)]
+        self.testHamFeature = self.feature_extract(test_ham_files, 'ham', self.n_gram)
         return self.testHamFeature
 
     def getTrainFeature(self):

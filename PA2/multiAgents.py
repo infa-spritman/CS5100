@@ -500,7 +500,7 @@ def manhattanDistance(xy1, xy2, info={}):
 #
 #     This might be a useful helper function for your ApproximateSearchAgent.
 #     """
-#     x1, y1 = point1
+#     x1, y1 = point
 #     x2, y2 = point2
 #     walls = gameState.getWalls()
 #     assert not walls[x1][y1], 'point1 is a wall: ' + str(point1)

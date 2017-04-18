@@ -30,12 +30,22 @@ def main():
     print('Test Ham accuracy: {0:.2f} %'.format(
         100 * nltk.classify.accuracy(c2.classifier, feature_object_two.getTestHamFeature())))
 
+    # 3 gram
+    feature_object_three = featExtract(spam_files, ham_files, 3, .7)
+    c3 = NBM()
+    c3.train(feature_object_three.getTrainFeature())
+    print('Test Spam accuracy: {0:.2f} %'.format(
+        100 * nltk.classify.accuracy(c3.classifier, feature_object_three.getTestSpamFeature())))
+    print('Test Ham accuracy: {0:.2f} %'.format(
+        100 * nltk.classify.accuracy(c3.classifier, feature_object_three.getTestHamFeature())))
 
     # Prob Distribution
     ut = util()
-    spam_prob_dist = ut.getProbDistribution(c1,c2,feature_object_one.trainSpamFeature,feature_object_two.trainSpamFeature)
+    spam_prob_dist = ut.getProbDistribution(c1,c2,c3,feature_object_one.trainSpamFeature,feature_object_two.trainSpamFeature,
+                                            feature_object_three.trainSpamFeature)
     print spam_prob_dist
-    ham_prob_dist = ut.getProbDistribution(c1,c2,feature_object_one.trainHamFeature,feature_object_two.trainHamFeature)
+    ham_prob_dist = ut.getProbDistribution(c1,c2,c3,feature_object_one.trainHamFeature,feature_object_two.trainHamFeature,
+                                           feature_object_three.trainHamFeature)
     print ham_prob_dist
 
 
