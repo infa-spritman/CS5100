@@ -3,8 +3,7 @@ from data_extractor.DSExtract import DSRxtract
 from feature_extractor.featExtract import featExtract
 from classifier.NaiveBayesClassifier import NBM
 from util.utils import util
-
-
+from relief.relief import reliefAlgo
 def main():
 
     rd ="dataset/enron-preprocessed/test"
@@ -13,7 +12,8 @@ def main():
     ds_extract = DSRxtract(rd)
     spam_files = ds_extract.getSpamFiles()
     ham_files= ds_extract.getHamFiles()
-
+    print len(spam_files)
+    print len(ham_files)
     # 1 gram
     feature_object_one = featExtract(spam_files,ham_files,1,.7)
     c1 = NBM()
@@ -43,10 +43,12 @@ def main():
     ut = util()
     spam_prob_dist = ut.getProbDistribution(c1,c2,c3,feature_object_one.trainSpamFeature,feature_object_two.trainSpamFeature,
                                             feature_object_three.trainSpamFeature)
-    print spam_prob_dist
     ham_prob_dist = ut.getProbDistribution(c1,c2,c3,feature_object_one.trainHamFeature,feature_object_two.trainHamFeature,
                                            feature_object_three.trainHamFeature)
-    print ham_prob_dist
+
+
+    a = reliefAlgo(spam_prob_dist,ham_prob_dist,len(spam_prob_dist) + len(ham_prob_dist))
+    print a.relief()
 
 
 if __name__ == '__main__':
