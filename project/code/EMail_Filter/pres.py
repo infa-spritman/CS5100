@@ -81,7 +81,7 @@ def getProbDist(c1,c2,files,tag):
 
 def main():
 
-    rd ="C:\\Users\\Bazingaaaa\\Desktop\\emailDataSet\\enron-preprocessed\\enron1"
+    rd ="C:\\Users\\Bazingaaaa\\Desktop\\emailDataSet\\enron-preprocessed\\test"
     spam_files = []
     ham_files= []
     for dirs, subdrs, fls in os.walk(rd):
