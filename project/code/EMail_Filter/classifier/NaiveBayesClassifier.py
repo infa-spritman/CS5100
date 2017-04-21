@@ -2,7 +2,6 @@ from nltk import NaiveBayesClassifier
 
 class NBM(object):
     def __init__(self):
-        print "constructor NBM"
         self.classifier = None
 
 

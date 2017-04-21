@@ -3,14 +3,17 @@ import os
 class DSRxtract(object):
 
     def __init__(self, path):
-        print "constructor"
+        print "[DsExtract] Extracting Dataset Files...."
         self.path = path
         self.spam_files = []
         self.ham_files = []
         self.create_files(self.path)
+        print "[DsExtract]  Extraction process done..."
 
     def create_files(self,path):
+        print "[DsExtract] Extracting Spam Dataset Files...."
         self.create_spam_files(path);
+        print "[DsExtract] Extracting Ham Dataset Files...."
         self.create_ham_files(path);
 
     def create_spam_files(self,path):
